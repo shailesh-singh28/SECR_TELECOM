@@ -16,8 +16,6 @@ import {
 } from 'lucide-react';
 
 import Dashboard from './components/Dashboard';
-import CableRoute from './components/CableRoute';
-import Patrolling from './components/Patrolling';
 import Meggering from './components/Meggering';
 import Reports from './components/Reports';
 import irLogo from './assets/ir_logo.jpg';
@@ -80,9 +78,9 @@ export default function App() {
       case 'dashboard':
         return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} />;
       case 'cable-route':
-        return <CableRoute />;
+        return null;
       case 'patrolling':
-        return <Patrolling />;
+        return null;
       case 'meggering':
         return <Meggering />;
       case 'reports':

@@ -166,7 +166,7 @@ export default function Dashboard({ alertState, triggerAlert }) {
               <line x1="380" y1="110" x2="320" y2="220" stroke="#5b73e5" strokeWidth="4" strokeDasharray="5,5" />
               <line x1="320" y1="220" x2="280" y2="240" stroke="#3cd070" strokeWidth="4" />
               <line x1="280" y1="240" x2="220" y2="270" stroke="#3cd070" strokeWidth="4" />
-              <line x1="220" y1="270" x2="120" y2="310" stroke="#f15858" strokeWidth="4" strokeWidth="3" />
+              <line x1="220" y1="270" x2="120" y2="310" stroke="#f15858" strokeWidth="4" />
 
               {/* Connecting line indicators */}
               {mapNodes.map((n) => (
