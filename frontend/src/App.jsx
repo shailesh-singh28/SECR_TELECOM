@@ -147,12 +147,6 @@ export default function App() {
         </nav>
 
         <div className="sidebar-footer">
-          <button 
-            className={`btn-emergency ${alertState.active ? 'active' : ''}`}
-            onClick={handleToggleAlert}
-          >
-            {alertState.active ? 'Clear Alert' : 'Emergency Alert'}
-          </button>
           <a className="nav-item" style={{ marginTop: 0 }} href="#help">
             <HelpCircle size={18} />
             HELP CENTER
@@ -169,7 +163,15 @@ export default function App() {
         <header className="top-header">
           <div className="header-links">
             <a className={`header-link ${currentPage === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentPage('dashboard')}>Home</a>
-            <a className="header-link" onClick={() => setCurrentPage('dashboard')}>GIS Map</a>
+            <a className="header-link" onClick={() => {
+              setCurrentPage('dashboard');
+              setTimeout(() => {
+                const element = document.getElementById('gis-map-panel');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }, 100);
+            }}>GIS Map</a>
           </div>
 
           <div className="header-controls">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet } from 'lucide-react';
+import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet, Users, ClipboardList, Ticket, Clock, MapPin, Navigation, Grid, Train, Package } from 'lucide-react';
 
 import img1 from '../assets/1.jpeg';
 import img2 from '../assets/2.jpeg';
@@ -10,6 +10,17 @@ import img6 from '../assets/6.jpeg';
 import mapPng from '../assets/map.png';
 
 const slides = [img1, img2, img3, img4, img5, img6];
+
+const passengerServices = [
+  { title: 'PNR Status Check', desc: 'Verify current booking status', icon: <ClipboardList size={18} />, url: 'https://www.indianrail.gov.in/enquiry/PNR/PnrEnquiry.html?locale=en' },
+  { title: 'Berth Reservation', desc: 'Online ticket booking via IRCTC', icon: <Ticket size={18} />, url: 'https://www.irctc.co.in/' },
+  { title: 'Train Schedule', desc: 'Check live timetables and routes', icon: <Clock size={18} />, url: 'https://www.indianrail.gov.in/enquiry/SCHEDULE/TrainSchedule.html' },
+  { title: 'Trains Between Stations', desc: 'Search direct and connecting routes', icon: <MapPin size={18} />, url: 'https://www.indianrail.gov.in/enquiry/TBIS/TrainsBetweenStations.html' },
+  { title: 'Spot Your Train', desc: 'Track live runs and schedules', icon: <Navigation size={18} />, url: 'https://enquiry.indianrail.gov.in/mntes/' },
+  { title: 'Seat Availability', desc: 'Verify coach occupancy information', icon: <Grid size={18} />, url: 'https://www.indianrail.gov.in/enquiry/SEAT/SeatAvailability.html' },
+  { title: 'Special Tourist Trains', desc: 'Discover luxury train journeys', icon: <Train size={18} />, url: 'https://www.irctctourism.com/' },
+  { title: 'Rail Tour Packages', desc: 'Explore IRCTC holiday packages', icon: <Package size={18} />, url: 'https://www.irctctourism.com/' },
+];
 
 export default function Dashboard({ alertState, triggerAlert }) {
   const [data, setData] = useState({
@@ -283,7 +294,7 @@ export default function Dashboard({ alertState, triggerAlert }) {
       {/* Interactive Middle Row (Map & Metrics) */}
       <div className="middle-row">
         {/* SECR Rail Route */}
-        <div className="panel">
+        <div id="gis-map-panel" className="panel">
           <div className="panel-header">
             <div className="panel-title">
               <Activity size={18} className="color-green" />
@@ -315,46 +326,66 @@ export default function Dashboard({ alertState, triggerAlert }) {
           </div>
         </div>
 
-        {/* Network Capacity and System Logs */}
+        {/* Passenger Services & Enquiry */}
         <div className="panel">
           <div className="panel-header">
             <div className="panel-title">
-              <Shield size={18} className="color-green" />
-              Network Capacity & Logs
+              <Users size={18} className="color-blue" />
+              Passenger Services & Enquiry
             </div>
           </div>
 
-          <div className="capacity-container">
-            <svg className="radial-progress" width="120" height="120">
-              <circle className="radial-bg" cx="60" cy="60" r="40" />
-              <circle 
-                className="radial-value" 
-                cx="60" 
-                cy="60" 
-                r="40" 
-                style={{ strokeDashoffset: 251.2 - (251.2 * data.networkCapacity) / 100 }} 
-              />
-            </svg>
-            <div className="capacity-text-center">
-              <span className="capacity-percent">{data.networkCapacity}%</span>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '20px', color: 'var(--text-secondary)' }}>
-            <span>OFC Backbone: 86.4 Gbps</span>
-            <span>Secondary Link: 12.1 Gbps</span>
-          </div>
-
-          <div className="panel-title" style={{ fontSize: '14px', marginBottom: '10px' }}>
-            System Logs
-          </div>
-          <div className="logs-list">
-            {logs.map((log) => (
-              <div key={log.id} className={`log-item ${log.type}`}>
-                <span className="log-time">{log.time}</span>
-                <span className="log-div">{log.division} Node</span>
-                <span>{log.message}</span>
-              </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '16px',
+            overflowY: 'auto',
+            maxHeight: '380px',
+            paddingRight: '4px'
+          }}>
+            {passengerServices.map((service, index) => (
+              <a 
+                key={index} 
+                href={service.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-sidebar)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+                  cursor: 'pointer'
+                }}
+                className="service-card-link"
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(91, 115, 229, 0.1)',
+                  color: 'var(--accent-blue)',
+                  flexShrink: 0
+                }}>
+                  {service.icon}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+                  <div style={{ fontSize: '13px', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {service.title}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {service.desc}
+                  </div>
+                </div>
+              </a>
             ))}
           </div>
         </div>
