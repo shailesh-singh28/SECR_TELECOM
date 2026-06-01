@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet } from 'lucide-react';
 
 import img1 from '../assets/1.jpeg';
@@ -7,6 +7,7 @@ import img3 from '../assets/3.jpeg';
 import img4 from '../assets/4.jpeg';
 import img5 from '../assets/5.jpeg';
 import img6 from '../assets/6.jpeg';
+import mapPng from '../assets/map.png';
 
 const slides = [img1, img2, img3, img4, img5, img6];
 
@@ -24,6 +25,144 @@ export default function Dashboard({ alertState, triggerAlert }) {
   const [selectedNode, setSelectedNode] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [zoom, setZoom] = useState(100);
+  const containerRef = useRef(null);
+  const scrollTargetRef = useRef(null);
+  const zoomRef = useRef(zoom);
+
+  // Keep zoomRef up-to-date with current state
+  useEffect(() => {
+    zoomRef.current = zoom;
+  }, [zoom]);
+
+  const handleZoomIn = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    const newZoom = Math.min(zoom + 10, 1000);
+    if (newZoom === zoom) return;
+
+    const rect = container.getBoundingClientRect();
+    const mouseX = rect.width / 2;
+    const mouseY = rect.height / 2;
+    const oldScrollLeft = container.scrollLeft;
+    const oldScrollTop = container.scrollTop;
+
+    scrollTargetRef.current = {
+      left: (oldScrollLeft + mouseX) * (newZoom / zoom) - mouseX,
+      top: (oldScrollTop + mouseY) * (newZoom / zoom) - mouseY
+    };
+    setZoom(newZoom);
+  };
+
+  const handleZoomOut = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    const newZoom = Math.max(zoom - 10, 100);
+    if (newZoom === zoom) return;
+
+    const rect = container.getBoundingClientRect();
+    const mouseX = rect.width / 2;
+    const mouseY = rect.height / 2;
+    const oldScrollLeft = container.scrollLeft;
+    const oldScrollTop = container.scrollTop;
+
+    scrollTargetRef.current = {
+      left: (oldScrollLeft + mouseX) * (newZoom / zoom) - mouseX,
+      top: (oldScrollTop + mouseY) * (newZoom / zoom) - mouseY
+    };
+    setZoom(newZoom);
+  };
+
+  // Listen to zoom changes and adjust container scrolls synchronously
+  useEffect(() => {
+    if (scrollTargetRef.current && containerRef.current) {
+      containerRef.current.scrollLeft = scrollTargetRef.current.left;
+      containerRef.current.scrollTop = scrollTargetRef.current.top;
+      scrollTargetRef.current = null;
+    }
+  }, [zoom]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e) => {
+      e.preventDefault();
+      const currentZoom = zoomRef.current;
+      const zoomFactor = 10;
+      let newZoom;
+      if (e.deltaY < 0) {
+        newZoom = Math.min(currentZoom + zoomFactor, 1000);
+      } else {
+        newZoom = Math.max(currentZoom - zoomFactor, 100);
+      }
+
+      if (newZoom === currentZoom) return;
+
+      const rect = container.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const oldScrollLeft = container.scrollLeft;
+      const oldScrollTop = container.scrollTop;
+
+      scrollTargetRef.current = {
+        left: (oldScrollLeft + mouseX) * (newZoom / currentZoom) - mouseX,
+        top: (oldScrollTop + mouseY) * (newZoom / currentZoom) - mouseY
+      };
+
+      setZoom(newZoom);
+    };
+
+    // Click and drag to pan
+    let isDown = false;
+    let startX;
+    let startY;
+    let scrollLeft;
+    let scrollTop;
+
+    const handleMouseDown = (e) => {
+      isDown = true;
+      container.style.cursor = 'grabbing';
+      startX = e.clientX;
+      startY = e.clientY;
+      scrollLeft = container.scrollLeft;
+      scrollTop = container.scrollTop;
+      e.preventDefault(); // Prevents selection/focus and default browser drag overrides
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.clientX;
+      const y = e.clientY;
+      const walkX = x - startX;
+      const walkY = y - startY;
+      container.scrollLeft = scrollLeft - walkX;
+      container.scrollTop = scrollTop - walkY;
+    };
+
+    const handleMouseUp = () => {
+      if (isDown) {
+        isDown = false;
+        container.style.cursor = 'grab';
+      }
+    };
+
+    // Set initial cursor style
+    container.style.cursor = 'grab';
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   useEffect(() => {
     const slideInterval = setInterval(() => {
@@ -143,59 +282,36 @@ export default function Dashboard({ alertState, triggerAlert }) {
 
       {/* Interactive Middle Row (Map & Metrics) */}
       <div className="middle-row">
-        {/* Live Infrastructure GIS Map */}
+        {/* SECR Rail Route */}
         <div className="panel">
           <div className="panel-header">
             <div className="panel-title">
               <Activity size={18} className="color-green" />
-              Live Infrastructure GIS
+              SECR Rail Route
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => setSelectedNode(null)}>
-                Layers
+              <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }} onClick={handleZoomOut}>
+                Zoom Out
               </button>
-              <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px' }}>
-                Export
+              <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }} onClick={handleZoomIn}>
+                Zoom In ({zoom}%)
               </button>
             </div>
           </div>
 
-          <div className="gis-container">
-            <svg className="gis-svg" viewBox="0 0 500 380">
-              {/* Railway route paths representing fiber lines */}
-              <line x1="380" y1="110" x2="320" y2="220" stroke="#5b73e5" strokeWidth="4" strokeDasharray="5,5" />
-              <line x1="320" y1="220" x2="280" y2="240" stroke="#3cd070" strokeWidth="4" />
-              <line x1="280" y1="240" x2="220" y2="270" stroke="#3cd070" strokeWidth="4" />
-              <line x1="220" y1="270" x2="120" y2="310" stroke="#f15858" strokeWidth="4" />
-
-              {/* Connecting line indicators */}
-              {mapNodes.map((n) => (
-                <g key={n.id} className="map-node" onClick={() => setSelectedNode(n)}>
-                  <circle cx={n.x} cy={n.y} r="8" fill={n.color} />
-                  <circle cx={n.x} cy={n.y} r="14" fill="none" stroke={n.color} strokeWidth="1.5" opacity="0.5" />
-                  <text x={n.x + 12} y={n.y + 4} fill="#fff" fontSize="10" fontWeight="bold">{n.id}</text>
-                </g>
-              ))}
-            </svg>
-
-            {/* Selected Node overlay details */}
-            <div className="map-tooltip">
-              <div className="map-tooltip-title">
-                {selectedNode ? 'ASSET HIGHLIGHT' : 'Interactive Map Guidelines'}
-              </div>
-              <div className="map-tooltip-desc">
-                {selectedNode ? (
-                  <div>
-                    <strong>{selectedNode.name}</strong>
-                    <div style={{ marginTop: '4px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                      {selectedNode.description}
-                    </div>
-                  </div>
-                ) : (
-                  'Click on any network junction node (BSP, R, NGP, G, D) to inspect assets, path routing, and fault status.'
-                )}
-              </div>
-            </div>
+          <div ref={containerRef} className="gis-container" style={{ overflow: 'auto', position: 'relative', width: '100%', height: '380px', display: 'block' }}>
+            <img 
+              src={mapPng} 
+              alt="SECR Infrastructure Map"
+              draggable="false"
+              style={{
+                width: `${zoom}%`,
+                height: `${zoom}%`,
+                objectFit: 'contain',
+                border: 'none',
+                display: 'block'
+              }}
+            />
           </div>
         </div>
 

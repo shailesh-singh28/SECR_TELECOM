@@ -9,15 +9,12 @@ import {
   HelpCircle, 
   LogOut, 
   Search, 
-  Bell, 
-  Settings,
   Sun,
   Moon
 } from 'lucide-react';
 
 import Dashboard from './components/Dashboard';
 import Meggering from './components/Meggering';
-import Reports from './components/Reports';
 import irLogo from './assets/ir_logo.jpg';
 
 export default function App() {
@@ -83,8 +80,8 @@ export default function App() {
         return null;
       case 'meggering':
         return <Meggering />;
-      case 'reports':
-        return <Reports />;
+      case 'daily position':
+        return null;
       default:
         return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} />;
     }
@@ -145,7 +142,7 @@ export default function App() {
             onClick={() => setCurrentPage('reports')}
           >
             <FileText size={18} />
-            REPORTS
+            DAILY POSITION
           </a>
         </nav>
 
@@ -173,13 +170,9 @@ export default function App() {
           <div className="header-links">
             <a className={`header-link ${currentPage === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentPage('dashboard')}>Home</a>
             <a className="header-link" onClick={() => setCurrentPage('dashboard')}>GIS Map</a>
-            <a className="header-link" onClick={() => setCurrentPage('patrolling')}>Maintenance</a>
-            <a className="header-link" onClick={() => setCurrentPage('cable-route')}>Inventory</a>
           </div>
 
           <div className="header-controls">
-            <Bell size={18} style={{ cursor: 'pointer', color: 'var(--text-secondary)' }} />
-            <Settings size={18} style={{ cursor: 'pointer', color: 'var(--text-secondary)' }} />
             <button 
                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                style={{

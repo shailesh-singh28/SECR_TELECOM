@@ -632,7 +632,7 @@ h1, h2, h3, h4, .font-outfit {
 /* Interactive Canvas/SVG GIS Map */
 .gis-container {
   position: relative;
-  background-color: #0b0f14;
+  background-color: transparent;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
@@ -640,6 +640,12 @@ h1, h2, h3, h4, .font-outfit {
   display: flex;
   justify-content: center;
   align-items: center;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.gis-container::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
 }
 
 .gis-svg {
