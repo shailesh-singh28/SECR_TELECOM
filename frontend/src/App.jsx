@@ -10,7 +10,9 @@ import {
   LogOut, 
   Search, 
   Sun,
-  Moon
+  Moon,
+  Menu,
+  X
 } from 'lucide-react';
 
 import Dashboard from './components/Dashboard';
@@ -20,6 +22,7 @@ import irLogo from './assets/ir_logo.jpg';
 export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [theme, setTheme] = useState('light');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [alertState, setAlertState] = useState({
     active: false,
     message: '',
@@ -89,8 +92,13 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* Sidebar Backdrop Overlay for Mobile */}
+      {isSidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
       {/* Sidebar Navigation */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img 
             src={irLogo} 
@@ -103,15 +111,32 @@ export default function App() {
               border: '2px solid var(--border-color)' 
             }} 
           />
-          <div>
-            <div className="logo-text">SECR TELECOM</div>
+          <div style={{ flexGrow: 1 }}>
+            <div className="logo-text">SECR</div>
+            <div className="logo-sub" style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>TELECOM</div>
           </div>
+          <button 
+            className="sidebar-close-btn" 
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '4px'
+            }}
+          >
+            <X size={18} />
+          </button>
         </div>
 
         <nav className="nav-links">
           <a 
             className={`nav-item ${currentPage === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('dashboard')}
+            onClick={() => { setCurrentPage('dashboard'); setIsSidebarOpen(false); }}
           >
             <LayoutDashboard size={18} />
             DASHBOARD
@@ -119,6 +144,7 @@ export default function App() {
           <a 
             className="nav-item"
             href="https://cable.secrtelecom.com/"
+            onClick={() => setIsSidebarOpen(false)}
           >
             <Route size={18} />
             CABLE ROUTE
@@ -126,6 +152,7 @@ export default function App() {
           <a 
             className="nav-item"
             href="https://ohe-tracker-frontend-vikzmhbwja-el.a.run.app/"
+            onClick={() => setIsSidebarOpen(false)}
           >
             <Eye size={18} />
             PATROLLING
@@ -133,13 +160,14 @@ export default function App() {
           <a 
             className="nav-item"
             href="https://meggering.secrtelecom.com/"
+            onClick={() => setIsSidebarOpen(false)}
           >
             <Activity size={18} />
             MEGGERING
           </a>
           <a 
             className={`nav-item ${currentPage === 'reports' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('reports')}
+            onClick={() => { setCurrentPage('reports'); setIsSidebarOpen(false); }}
           >
             <FileText size={18} />
             DAILY POSITION
@@ -161,17 +189,37 @@ export default function App() {
       {/* Main Panel Content Area */}
       <div className="main-wrapper">
         <header className="top-header">
-          <div className="header-links">
-            <a className={`header-link ${currentPage === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentPage('dashboard')}>Home</a>
-            <a className="header-link" onClick={() => {
-              setCurrentPage('dashboard');
-              setTimeout(() => {
-                const element = document.getElementById('gis-map-panel');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-              }, 100);
-            }}>GIS Map</a>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button 
+              className="hamburger-btn"
+              onClick={() => setIsSidebarOpen(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-primary)',
+                display: 'none', // styled/displayed in CSS under media query
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '8px',
+                marginRight: '12px'
+              }}
+            >
+              <Menu size={22} />
+            </button>
+            <div className="header-links">
+              <a className={`header-link ${currentPage === 'dashboard' ? 'active' : ''}`} onClick={() => { setCurrentPage('dashboard'); setIsSidebarOpen(false); }}>Home</a>
+              <a className="header-link" onClick={() => {
+                setCurrentPage('dashboard');
+                setIsSidebarOpen(false);
+                setTimeout(() => {
+                  const element = document.getElementById('gis-map-panel');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }, 100);
+              }}>GIS Map</a>
+            </div>
           </div>
 
           <div className="header-controls">

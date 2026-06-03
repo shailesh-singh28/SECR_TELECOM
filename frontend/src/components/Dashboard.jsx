@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet, Users, ClipboardList, Ticket, Clock, MapPin, Navigation, Grid, Train, Package } from 'lucide-react';
+import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet, Users, ClipboardList, Ticket, Clock, MapPin, Navigation, Grid, Train, Package, Network, Server, Zap, Radio, ShieldAlert } from 'lucide-react';
 
 import img1 from '../assets/1.jpeg';
 import img2 from '../assets/2.jpeg';
@@ -25,9 +25,9 @@ const passengerServices = [
 export default function Dashboard({ alertState, triggerAlert }) {
   const [data, setData] = useState({
     divisions: {
-      BSP: { name: 'Bilaspur Division', node: 'Bilaspur Node', uptime: 99.8, activeNodes: 12, totalNodes: 12, status: 'Active', code: 'B' },
-      R: { name: 'Raipur Division', node: 'Raipur Node', uptime: 100.0, activeNodes: 58, totalNodes: 58, status: 'Stable', code: 'R' },
-      NGP: { name: 'Nagpur Division', node: 'Nagpur Node', uptime: 82.4, activeNodes: 13, totalNodes: 15, status: 'Warning', code: 'N' }
+      BSP: { name: 'Bilaspur Division', node: 'Bilaspur Node', uptime: 99.8, activeNodes: 12, totalNodes: 12, status: 'Active', code: 'B', routeLength: 1097 },
+      R: { name: 'Raipur Division', node: 'Raipur Node', uptime: 100.0, activeNodes: 58, totalNodes: 58, status: 'Stable', code: 'R', routeLength: 435 },
+      NGP: { name: 'Nagpur Division', node: 'Nagpur Node', uptime: 82.4, activeNodes: 13, totalNodes: 15, status: 'Warning', code: 'N', routeLength: 1005 }
     },
     networkCapacity: 72
   });
@@ -259,31 +259,84 @@ export default function Dashboard({ alertState, triggerAlert }) {
       <div className="division-grid">
         {Object.entries(data.divisions).map(([code, div]) => {
           let cardType = 'success';
-          if (div.uptime < 90) cardType = 'warning';
-          else if (div.uptime < 100) cardType = 'info';
+          let ringColor = 'var(--accent-green)';
+          if (div.uptime < 90) {
+            cardType = 'warning';
+            ringColor = 'var(--accent-red)';
+          } else if (div.uptime < 100) {
+            cardType = 'info';
+            ringColor = 'var(--accent-blue)';
+          }
+
+          // Choose icon for division badge
+          let divisionIcon = <Network size={18} />;
+          if (code === 'BSP') divisionIcon = <Zap size={18} />;
+          if (code === 'R') divisionIcon = <Server size={18} />;
+          if (code === 'NGP') divisionIcon = <Radio size={18} />;
+
+          // Circular progress values (radius = 28, circumference = 2 * pi * 28 = 175.93)
+          const radius = 28;
+          const strokeWidth = 5;
+          const circumference = 2 * Math.PI * radius;
+          const strokeDashoffset = circumference - (div.uptime / 100) * circumference;
 
           return (
             <div key={code} className={`div-card ${cardType}`}>
               <div className="div-header">
-                <div>
-                  <div className="div-title">{div.name}</div>
-                  <div className="div-node">{div.node}</div>
-                </div>
-                <div className="div-badge">{div.code}</div>
+                <div className="div-title">{div.name}</div>
+                <div className="div-badge">{divisionIcon}</div>
               </div>
-              <div className="div-uptime">
-                {div.uptime}%
-                <span className="div-uptime-label">Uptime</span>
-              </div>
-              <div className="div-footer">
-                <div className="status-indicator">
-                  <span className={`status-dot ${div.uptime >= 100 ? 'bg-green' : div.uptime >= 90 ? 'bg-blue' : 'bg-red'}`}></span>
-                  <span className={div.uptime >= 100 ? 'color-green' : div.uptime >= 90 ? 'color-blue' : 'color-red'}>
-                    {div.status}
-                  </span>
+
+              <div className="div-card-body">
+                <div className="div-card-info-col">
+                  <div className="div-route-length-badge">
+                    <MapPin size={12} className="color-blue" />
+                    <span>{div.routeLength || '—'} Route km</span>
+                  </div>
+                  
+                  <div className="status-indicator" style={{ marginTop: '4px' }}>
+                    <span className={`status-dot ${div.uptime >= 100 ? 'bg-green' : div.uptime >= 90 ? 'bg-blue' : 'bg-red'}`}></span>
+                    <span className={div.uptime >= 100 ? 'color-green' : div.uptime >= 90 ? 'color-blue' : 'color-red'} style={{ fontSize: '12px' }}>
+                      {div.status}
+                    </span>
+                  </div>
+
+                  <div style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '500', marginTop: '2px' }}>
+                    {div.activeNodes} / {div.totalNodes} Nodes Active
+                  </div>
                 </div>
-                <div style={{ color: 'var(--text-muted)' }}>
-                  {div.activeNodes} / {div.totalNodes} Nodes Active
+
+                <div className="div-card-chart-col">
+                  <div className="uptime-ring-container">
+                    <svg width="76" height="76" className="radial-progress">
+                      {/* Track circle */}
+                      <circle
+                        cx="38"
+                        cy="38"
+                        r={radius}
+                        stroke="var(--border-color)"
+                        strokeWidth={strokeWidth}
+                        fill="transparent"
+                      />
+                      {/* Value circle */}
+                      <circle
+                        cx="38"
+                        cy="38"
+                        r={radius}
+                        stroke={ringColor}
+                        strokeWidth={strokeWidth}
+                        fill="transparent"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        style={{ transition: 'stroke-dashoffset 0.8s ease' }}
+                      />
+                    </svg>
+                    <div className="uptime-ring-center-text">
+                      <span className="uptime-ring-percent">{div.uptime}%</span>
+                      <span className="uptime-ring-label">Uptime</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
