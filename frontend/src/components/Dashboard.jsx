@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet, Users, ClipboardList, Ticket, Clock, MapPin, Navigation, Grid, Train, Package, Network, Server, Zap, Radio, ShieldAlert } from 'lucide-react';
+import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet, Users, ClipboardList, Ticket, Clock, MapPin, Navigation, Grid, Train, Package, Network, Server, Zap, Radio, ShieldAlert, Play, Flag, Info, Ruler } from 'lucide-react';
 
 import img1 from '../assets/1.jpeg';
 import img2 from '../assets/2.jpeg';
@@ -214,6 +214,39 @@ export default function Dashboard({ alertState, triggerAlert }) {
     { id: 'D', name: 'Durg Node (D)', x: 280, y: 240, status: 'Active', description: 'OFC terminal and distribution point. All systems operating within thresholds.', color: '#3cd070' }
   ];
 
+  const divisionDetails = {
+    BSP: {
+      themeClass: 'theme-bsp',
+      image: img1,
+      start: 'Bilaspur Junction',
+      end: 'Jharsuguda Junction',
+      direction: 'Bilaspur → Raigarh → Jharsuguda (Eastward)',
+      length: '~1097 route km',
+      nodes: ['Bilaspur Junction', 'Raigarh', 'Jharsuguda Junction'],
+      info: 'This is a simplified representative route. Bilaspur Division contains multiple branch lines and sections extending in several directions.'
+    },
+    R: {
+      themeClass: 'theme-raipur',
+      image: img2,
+      start: 'Raipur Junction',
+      end: 'Gondia Junction',
+      direction: 'Raipur → Durg → Gondia (Westward)',
+      length: '~435 route km',
+      nodes: ['Raipur Junction', 'Durg', 'Gondia Junction'],
+      info: 'This is a simplified representative route. Raipur Division also includes connecting sections toward Bhilai and other important industrial areas.'
+    },
+    NGP: {
+      themeClass: 'theme-nagpur',
+      image: img3,
+      start: 'Nagpur',
+      end: 'Kazipet Junction',
+      direction: 'Nagpur → Ballarshah → Kazipet (Southward Trunk Route)',
+      length: '~1005 route km',
+      nodes: ['Nagpur', 'Ballarshah', 'Kazipet Junction'],
+      info: 'This is a simplified representative route. Nagpur Division covers several major trunk and branch routes in the region.'
+    }
+  };
+
   return (
     <div>
       {/* Hero Banner Section */}
@@ -256,89 +289,56 @@ export default function Dashboard({ alertState, triggerAlert }) {
       </div>
 
       {/* Division Status Cards */}
-      <div className="division-grid">
+      <div className="division-list">
         {Object.entries(data.divisions).map(([code, div]) => {
-          let cardType = 'success';
-          let ringColor = 'var(--accent-green)';
-          if (div.uptime < 90) {
-            cardType = 'warning';
-            ringColor = 'var(--accent-red)';
-          } else if (div.uptime < 100) {
-            cardType = 'info';
-            ringColor = 'var(--accent-blue)';
-          }
-
-          // Choose icon for division badge
-          let divisionIcon = <Network size={18} />;
-          if (code === 'BSP') divisionIcon = <Zap size={18} />;
-          if (code === 'R') divisionIcon = <Server size={18} />;
-          if (code === 'NGP') divisionIcon = <Radio size={18} />;
-
-          // Circular progress values (radius = 28, circumference = 2 * pi * 28 = 175.93)
-          const radius = 28;
-          const strokeWidth = 5;
-          const circumference = 2 * Math.PI * radius;
-          const strokeDashoffset = circumference - (div.uptime / 100) * circumference;
-
+          const details = divisionDetails[code] || {};
           return (
-            <div key={code} className={`div-card ${cardType}`}>
-              <div className="div-header">
-                <div className="div-title">{div.name}</div>
-                <div className="div-badge">{divisionIcon}</div>
-              </div>
-
-              <div className="div-card-body">
-                <div className="div-card-info-col">
-                  <div className="div-route-length-badge">
-                    <MapPin size={12} className="color-blue" />
-                    <span>{div.routeLength || '—'} Route km</span>
+            <div key={code} className={`div-card-new ${details.themeClass || ''}`}>
+              {/* Middle Details Section */}
+              <div className="div-details-col">
+                <div className="div-new-title">{div.name}</div>
+                
+                <div className="detail-row">
+                  <div className="detail-icon-wrapper">
+                    <Play size={12} style={{ fill: 'currentColor', transform: 'translateX(1px)' }} />
                   </div>
-                  
-                  <div className="status-indicator" style={{ marginTop: '4px' }}>
-                    <span className={`status-dot ${div.uptime >= 100 ? 'bg-green' : div.uptime >= 90 ? 'bg-blue' : 'bg-red'}`}></span>
-                    <span className={div.uptime >= 100 ? 'color-green' : div.uptime >= 90 ? 'color-blue' : 'color-red'} style={{ fontSize: '12px' }}>
-                      {div.status}
-                    </span>
-                  </div>
-
-                  <div style={{ color: 'var(--text-muted)', fontSize: '11px', fontWeight: '500', marginTop: '2px' }}>
-                    {div.activeNodes} / {div.totalNodes} Nodes Active
+                  <div className="detail-text">
+                    <span className="detail-label">Starting Point</span>
+                    <span className="detail-value">{details.start}</span>
                   </div>
                 </div>
 
-                <div className="div-card-chart-col">
-                  <div className="uptime-ring-container">
-                    <svg width="76" height="76" className="radial-progress">
-                      {/* Track circle */}
-                      <circle
-                        cx="38"
-                        cy="38"
-                        r={radius}
-                        stroke="var(--border-color)"
-                        strokeWidth={strokeWidth}
-                        fill="transparent"
-                      />
-                      {/* Value circle */}
-                      <circle
-                        cx="38"
-                        cy="38"
-                        r={radius}
-                        stroke={ringColor}
-                        strokeWidth={strokeWidth}
-                        fill="transparent"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={strokeDashoffset}
-                        strokeLinecap="round"
-                        style={{ transition: 'stroke-dashoffset 0.8s ease' }}
-                      />
-                    </svg>
-                    <div className="uptime-ring-center-text">
-                      <span className="uptime-ring-percent">{div.uptime}%</span>
-                      <span className="uptime-ring-label">Uptime</span>
-                    </div>
+                <div className="detail-row">
+                  <div className="detail-icon-wrapper">
+                    <Flag size={12} style={{ fill: 'currentColor' }} />
+                  </div>
+                  <div className="detail-text">
+                    <span className="detail-label">Ending Point</span>
+                    <span className="detail-value">{details.end}</span>
+                  </div>
+                </div>
+
+                <div className="detail-row">
+                  <div className="detail-icon-wrapper">
+                    <Network size={12} />
+                  </div>
+                  <div className="detail-text">
+                    <span className="detail-label">Major Route Direction</span>
+                    <span className="detail-value">{details.direction}</span>
+                  </div>
+                </div>
+
+                <div className="detail-row">
+                  <div className="detail-icon-wrapper">
+                    <Ruler size={12} />
+                  </div>
+                  <div className="detail-text">
+                    <span className="detail-label">Approx. Route Length</span>
+                    <span className="detail-value">{details.length}</span>
                   </div>
                 </div>
               </div>
+
             </div>
           );
         })}
