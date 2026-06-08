@@ -146,37 +146,7 @@ export default function App() {
         </div>
 
         <nav className="nav-links">
-          <div className="nav-dropdown-container">
-            <button 
-              className="nav-item nav-dropdown-btn"
-              onClick={() => setIsAssetOpen(!isAssetOpen)}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <Layers size={18} />
-                Asset
-              </span>
-              {isAssetOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
-            
-            {isAssetOpen && (
-              <div className="nav-dropdown-items">
-                <a 
-                  className={`nav-item sub-item ${currentPage === 'communication' ? 'active' : ''}`}
-                  onClick={(e) => { e.preventDefault(); }}
-                >
-                  <Network size={16} />
-                  Communication
-                </a>
-                <a 
-                  className={`nav-item sub-item ${currentPage === 'passenger-amenities' ? 'active' : ''}`}
-                  onClick={(e) => { e.preventDefault(); }}
-                >
-                  <Users size={16} />
-                  Passenger Amenities
-                </a>
-              </div>
-            )}
-          </div>
+          
           <a 
             className="nav-item"
             href="https://cable.secrtelecom.com/"
@@ -208,6 +178,37 @@ export default function App() {
             <FileText size={18} />
             DAILY POSITION
           </a>
+          <div className="nav-dropdown-container">
+            <button 
+              className="nav-item nav-dropdown-btn"
+              onClick={() => setIsAssetOpen(!isAssetOpen)}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Layers size={18} />
+                ASSET
+              </span>
+              {isAssetOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+            
+            {isAssetOpen && (
+              <div className="nav-dropdown-items">
+                <a 
+                  className={`nav-item sub-item ${currentPage === 'communication' ? 'active' : ''}`}
+                  onClick={(e) => { e.preventDefault(); }}
+                >
+                  <Network size={16} />
+                  Communication
+                </a>
+                <a 
+                  className={`nav-item sub-item ${currentPage === 'passenger-amenities' ? 'active' : ''}`}
+                  onClick={(e) => { e.preventDefault(); }}
+                >
+                  <Users size={16} />
+                  Passenger Amenities
+                </a>
+              </div>
+            )}
+          </div>
         </nav>
 
       </aside>
