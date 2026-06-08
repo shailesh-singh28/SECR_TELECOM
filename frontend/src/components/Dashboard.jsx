@@ -373,10 +373,8 @@ export default function Dashboard({ alertState, triggerAlert, mode = 'all' }) {
         </h1>
         
         {/* Tricolor divider line */}
-        <div style={{ display: 'flex', width: '150px', height: '6px', borderRadius: '3px', overflow: 'hidden', margin: '14px 0 18px 0' }}>
-          <div style={{ flex: 1, backgroundColor: '#FF9933' }}></div>
-          <div style={{ flex: 1, backgroundColor: '#FFFFFF' }}></div>
-          <div style={{ flex: 1, backgroundColor: '#138808' }}></div>
+        <div style={{ display: 'flex', width: '300px', height: '6px', borderRadius: '3px', overflow: 'hidden', margin: '14px 0 18px 0' }}>
+          <div style={{ flex: 1, backgroundColor: '#ea580c' }}></div>
         </div>
 
         <p className="hero-description">

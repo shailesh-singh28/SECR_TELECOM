@@ -110,7 +110,7 @@ export default function App() {
         <div 
           className="logo-container" 
           onClick={() => { setCurrentPage('dashboard'); setIsSidebarOpen(false); }}
-          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
         >
           <img 
             src={irLogo} 
@@ -120,10 +120,11 @@ export default function App() {
               height: '40px', 
               borderRadius: '50%', 
               objectFit: 'cover',
-              border: '2px solid var(--border-color)' 
+              border: '2px solid var(--border-color)',
+              cursor: 'pointer' 
             }} 
           />
-          <div style={{ flexGrow: 1 }}>
+          <div style={{ flexGrow: 0 }}>
             <div className="logo-text">SECR</div>
             <div className="logo-sub" style={{ fontSize: '10px', color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '1px' }}>TELECOM</div>
           </div>
