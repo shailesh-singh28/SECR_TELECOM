@@ -154,6 +154,49 @@ h1, h2, h3, h4, .font-outfit {
   box-shadow: 0 4px 12px rgba(244, 126, 76, 0.25);
 }
 
+.nav-dropdown-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-dropdown-btn {
+  background: transparent;
+  border: none;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: inherit;
+}
+
+.nav-dropdown-btn:focus {
+  outline: none;
+}
+
+.nav-dropdown-items {
+  margin-left: 12px;
+  border-left: 1.5px solid var(--border-color);
+  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.sub-item {
+  padding: 8px 12px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+}
+
+.sub-item.active {
+  font-weight: 600 !important;
+  background-color: rgba(244, 126, 76, 0.15) !important;
+  color: var(--accent-orange) !important;
+  box-shadow: none !important;
+}
+
 .sidebar-footer {
   margin-top: auto;
   display: flex;

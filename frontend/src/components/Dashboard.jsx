@@ -22,7 +22,7 @@ const passengerServices = [
   { title: 'Rail Tour Packages', desc: 'Explore IRCTC holiday packages', icon: <Package size={18} />, url: 'https://www.irctctourism.com/' },
 ];
 
-export default function Dashboard({ alertState, triggerAlert }) {
+export default function Dashboard({ alertState, triggerAlert, mode = 'all' }) {
   const [data, setData] = useState({
     divisions: {
       BSP: { name: 'Bilaspur Division', node: 'Bilaspur Node', uptime: 99.8, activeNodes: 12, totalNodes: 12, status: 'Active', code: 'B', routeLength: 1097 },
@@ -247,6 +247,105 @@ export default function Dashboard({ alertState, triggerAlert }) {
     }
   };
 
+  const renderMapPanel = (height = '380px') => (
+    <div id="gis-map-panel" className="panel">
+      <div className="panel-header">
+        <div className="panel-title">
+          <Activity size={18} className="color-green" />
+          SECR Rail Route
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }} onClick={handleZoomOut}>
+            Zoom Out
+          </button>
+          <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }} onClick={handleZoomIn}>
+            Zoom In ({zoom}%)
+          </button>
+        </div>
+      </div>
+
+      <div ref={containerRef} className="gis-container" style={{ overflow: 'auto', position: 'relative', width: '100%', height: height, display: 'block' }}>
+        <img 
+          src={mapPng} 
+          alt="SECR Infrastructure Map"
+          draggable="false"
+          style={{
+            width: `${zoom}%`,
+            height: `${zoom}%`,
+            objectFit: 'contain',
+            border: 'none',
+            display: 'block'
+          }}
+        />
+      </div>
+    </div>
+  );
+
+  const renderPassengerAmenitiesPanel = (gridMin = '220px', maxHeight = '380px', padding = '12px 14px', iconSize = '18', iconBgSize = '36px', iconBgRadius = '8px', titleSize = '13px', descSize = '11px') => (
+    <div className="panel" style={{ width: '100%' }}>
+      <div className="panel-header">
+        <div className="panel-title">
+          <Users size={18} className="color-blue" />
+          Passenger Services & Enquiry
+        </div>
+      </div>
+
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(auto-fit, minmax(${gridMin}, 1fr))`,
+        gap: '16px',
+        overflowY: maxHeight === 'none' ? 'visible' : 'auto',
+        maxHeight: maxHeight,
+        paddingRight: '4px'
+      }}>
+        {passengerServices.map((service, index) => (
+          <a 
+            key={index} 
+            href={service.url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: padding,
+              borderRadius: '8px',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-sidebar)',
+              textDecoration: 'none',
+              color: 'inherit',
+              transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+              cursor: 'pointer'
+            }}
+            className="service-card-link"
+          >
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: iconBgSize,
+              height: iconBgSize,
+              borderRadius: iconBgRadius,
+              backgroundColor: 'rgba(91, 115, 229, 0.1)',
+              color: 'var(--accent-blue)',
+              flexShrink: 0
+            }}>
+              {React.cloneElement(service.icon, { size: parseInt(iconSize) })}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+              <div style={{ fontSize: titleSize, fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {service.title}
+              </div>
+              <div style={{ fontSize: descSize, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {service.desc}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div>
       {/* Hero Banner Section */}
@@ -265,10 +364,12 @@ export default function Dashboard({ alertState, triggerAlert }) {
           <div className="hero-banner-gradient" />
         </div>
 
-        <span className="hero-tag">Operational Excellence</span>
+        <span className="hero-tag">
+          {mode === 'passenger-amenities' ? 'Passenger Services' : 'Operational Excellence'}
+        </span>
         <h1 className="hero-title" style={{ marginBottom: '10px' }}>
-          SECR TELECOM <br />
-          <span style={{ fontSize: '32px', fontWeight: '700', opacity: 0.9 }}>_</span>
+          {mode === 'passenger-amenities' ? 'PASSENGER AMENITIES' : 'SECR TELECOM'} <br />
+          {/* <span style={{ fontSize: '32px', fontWeight: '700', opacity: 0.9 }}>_</span> */}
         </h1>
         
         {/* Tricolor divider line */}
@@ -279,7 +380,9 @@ export default function Dashboard({ alertState, triggerAlert }) {
         </div>
 
         <p className="hero-description">
-          The grand administrative heart of South East Central Railway operations, digital utility portals, and regional connectivity.
+          {mode === 'passenger-amenities' 
+            ? 'Access essential Indian Railways passenger utilities, online reservations, train schedules, and live tracking.'
+            : 'An integrated digital platform designed to manage telecom assets, monitor daily operations, maintain cable route records, track patrolling activities, and oversee megger testing status for efficient maintenance and monitoring of railway telecom infrastructure across the division.'}
         </p>
         <div className="hero-buttons">
           <button className="btn-primary" onClick={fetchData}>
@@ -288,195 +391,120 @@ export default function Dashboard({ alertState, triggerAlert }) {
         </div>
       </div>
 
-      {/* Division Status Cards */}
-      <div className="division-list">
-        {Object.entries(data.divisions).map(([code, div]) => {
-          const details = divisionDetails[code] || {};
-          return (
-            <div key={code} className={`div-card-new ${details.themeClass || ''}`}>
-              {/* Middle Details Section */}
-              <div className="div-details-col">
-                <div className="div-new-title">{div.name}</div>
-                
-                <div className="detail-row">
-                  <div className="detail-icon-wrapper">
-                    <Play size={12} style={{ fill: 'currentColor', transform: 'translateX(1px)' }} />
-                  </div>
-                  <div className="detail-text">
-                    <span className="detail-label">Starting Point</span>
-                    <span className="detail-value">{details.start}</span>
+      {(mode === 'all' || mode === 'communication') && (
+        <>
+          {/* Division Status Cards */}
+          <div className="division-list">
+            {Object.entries(data.divisions).map(([code, div]) => {
+              const details = divisionDetails[code] || {};
+              return (
+                <div key={code} className={`div-card-new ${details.themeClass || ''}`}>
+                  {/* Middle Details Section */}
+                  <div className="div-details-col">
+                    <div className="div-new-title">{div.name}</div>
+                    
+                    <div className="detail-row">
+                      <div className="detail-icon-wrapper">
+                        <Play size={12} style={{ fill: 'currentColor', transform: 'translateX(1px)' }} />
+                      </div>
+                      <div className="detail-text">
+                        <span className="detail-label">Starting Point</span>
+                        <span className="detail-value">{details.start}</span>
+                      </div>
+                    </div>
+
+                    <div className="detail-row">
+                      <div className="detail-icon-wrapper">
+                        <Flag size={12} style={{ fill: 'currentColor' }} />
+                      </div>
+                      <div className="detail-text">
+                        <span className="detail-label">Ending Point</span>
+                        <span className="detail-value">{details.end}</span>
+                      </div>
+                    </div>
+
+                    <div className="detail-row">
+                      <div className="detail-icon-wrapper">
+                        <Network size={12} />
+                      </div>
+                      <div className="detail-text">
+                        <span className="detail-label">Major Route Direction</span>
+                        <span className="detail-value">{details.direction}</span>
+                      </div>
+                    </div>
+
+                    <div className="detail-row">
+                      <div className="detail-icon-wrapper">
+                        <Ruler size={12} />
+                      </div>
+                      <div className="detail-text">
+                        <span className="detail-label">Approx. Route Length</span>
+                        <span className="detail-value">{details.length}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                <div className="detail-row">
-                  <div className="detail-icon-wrapper">
-                    <Flag size={12} style={{ fill: 'currentColor' }} />
-                  </div>
-                  <div className="detail-text">
-                    <span className="detail-label">Ending Point</span>
-                    <span className="detail-value">{details.end}</span>
-                  </div>
-                </div>
-
-                <div className="detail-row">
-                  <div className="detail-icon-wrapper">
-                    <Network size={12} />
-                  </div>
-                  <div className="detail-text">
-                    <span className="detail-label">Major Route Direction</span>
-                    <span className="detail-value">{details.direction}</span>
-                  </div>
-                </div>
-
-                <div className="detail-row">
-                  <div className="detail-icon-wrapper">
-                    <Ruler size={12} />
-                  </div>
-                  <div className="detail-text">
-                    <span className="detail-label">Approx. Route Length</span>
-                    <span className="detail-value">{details.length}</span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          );
-        })}
-      </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {/* Interactive Middle Row (Map & Metrics) */}
-      <div className="middle-row">
-        {/* SECR Rail Route */}
-        <div id="gis-map-panel" className="panel">
-          <div className="panel-header">
-            <div className="panel-title">
-              <Activity size={18} className="color-green" />
-              SECR Rail Route
-            </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }} onClick={handleZoomOut}>
-                Zoom Out
-              </button>
-              <button className="btn-outline" style={{ padding: '6px 12px', fontSize: '12px', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }} onClick={handleZoomIn}>
-                Zoom In ({zoom}%)
-              </button>
-            </div>
-          </div>
-
-          <div ref={containerRef} className="gis-container" style={{ overflow: 'auto', position: 'relative', width: '100%', height: '380px', display: 'block' }}>
-            <img 
-              src={mapPng} 
-              alt="SECR Infrastructure Map"
-              draggable="false"
-              style={{
-                width: `${zoom}%`,
-                height: `${zoom}%`,
-                objectFit: 'contain',
-                border: 'none',
-                display: 'block'
-              }}
-            />
-          </div>
+      {mode === 'all' && (
+        <div className="middle-row">
+          {renderMapPanel('380px')}
+          {renderPassengerAmenitiesPanel('220px', '380px', '12px 14px', '18', '36px', '8px', '13px', '11px')}
         </div>
+      )}
 
-        {/* Passenger Services & Enquiry */}
-        <div className="panel">
+      {mode === 'communication' && (
+        <div className="middle-row" style={{ gridTemplateColumns: '1fr' }}>
+          {renderMapPanel('480px')}
+        </div>
+      )}
+
+      {mode === 'passenger-amenities' && (
+        <div style={{ marginTop: '24px' }}>
+          {renderPassengerAmenitiesPanel('280px', 'none', '16px 20px', '22', '44px', '10px', '15px', '12px')}
+        </div>
+      )}
+
+      {(mode === 'all' || mode === 'communication') && (
+        /* Infrastructure Health Index */
+        <div className="panel health-index-panel" style={{ marginTop: '24px' }}>
           <div className="panel-header">
             <div className="panel-title">
-              <Users size={18} className="color-blue" />
-              Passenger Services & Enquiry
+              <Activity size={18} className="color-blue" />
+              Infrastructure Health Index
+            </div>
+            <div style={{ display: 'flex', gap: '20px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="status-dot bg-blue"></span> Copper Links</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="status-dot bg-green"></span> Fiber Links</span>
             </div>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '16px',
-            overflowY: 'auto',
-            maxHeight: '380px',
-            paddingRight: '4px'
-          }}>
-            {passengerServices.map((service, index) => (
-              <a 
-                key={index} 
-                href={service.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px 14px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-sidebar)',
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
-                  cursor: 'pointer'
-                }}
-                className="service-card-link"
-              >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  backgroundColor: 'rgba(91, 115, 229, 0.1)',
-                  color: 'var(--accent-blue)',
-                  flexShrink: 0
-                }}>
-                  {service.icon}
+          <div className="health-bar-container">
+            {Object.entries(data.divisions).map(([code, div]) => (
+              <div className="health-row" key={code}>
+                <div className="health-labels">
+                  <span>{div.name} ({code})</span>
+                  <span style={{ fontWeight: 'bold' }}>{div.uptime >= 100 ? '92%' : div.uptime >= 95 ? '88%' : '75%'} CAPACITY</span>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
-                  <div style={{ fontSize: '13px', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {service.title}
-                  </div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {service.desc}
-                  </div>
+                <div className="health-track">
+                  <div 
+                    className="health-fill" 
+                    style={{ 
+                      width: `${div.uptime >= 100 ? 92 : div.uptime >= 95 ? 88 : 75}%`,
+                      background: `linear-gradient(90deg, var(--accent-blue) 60%, ${div.uptime >= 95 ? 'var(--accent-green)' : 'var(--accent-red)'} 100%)`
+                    }}
+                  ></div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Infrastructure Health Index */}
-      <div className="panel health-index-panel">
-        <div className="panel-header">
-          <div className="panel-title">
-            <Activity size={18} className="color-blue" />
-            Infrastructure Health Index
-          </div>
-          <div style={{ display: 'flex', gap: '20px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="status-dot bg-blue"></span> Copper Links</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="status-dot bg-green"></span> Fiber Links</span>
-          </div>
-        </div>
-
-        <div className="health-bar-container">
-          {Object.entries(data.divisions).map(([code, div]) => (
-            <div className="health-row" key={code}>
-              <div className="health-labels">
-                <span>{div.name} ({code})</span>
-                <span style={{ fontWeight: 'bold' }}>{div.uptime >= 100 ? '92%' : div.uptime >= 95 ? '88%' : '75%'} CAPACITY</span>
-              </div>
-              <div className="health-track">
-                <div 
-                  className="health-fill" 
-                  style={{ 
-                    width: `${div.uptime >= 100 ? 92 : div.uptime >= 95 ? 88 : 75}%`,
-                    background: `linear-gradient(90deg, var(--accent-blue) 60%, ${div.uptime >= 95 ? 'var(--accent-green)' : 'var(--accent-red)'} 100%)`
-                  }}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

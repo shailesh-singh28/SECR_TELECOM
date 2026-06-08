@@ -6,13 +6,16 @@ import {
   Activity, 
   FileText, 
   AlertOctagon, 
-  HelpCircle, 
-  LogOut, 
   Search, 
   Sun,
   Moon,
   Menu,
-  X
+  X,
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  Network,
+  Users
 } from 'lucide-react';
 
 import Dashboard from './components/Dashboard';
@@ -21,6 +24,7 @@ import irLogo from './assets/ir_logo.jpg';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [isAssetOpen, setIsAssetOpen] = useState(false);
   const [theme, setTheme] = useState('light');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [alertState, setAlertState] = useState({
@@ -76,7 +80,11 @@ export default function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} />;
+        return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} mode="all" />;
+      case 'communication':
+        return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} mode="communication" />;
+      case 'passenger-amenities':
+        return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} mode="passenger-amenities" />;
       case 'cable-route':
         return null;
       case 'patrolling':
@@ -86,7 +94,7 @@ export default function App() {
       case 'daily position':
         return null;
       default:
-        return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} />;
+        return <Dashboard alertState={alertState} triggerAlert={handleToggleAlert} mode="all" />;
     }
   };
 
@@ -99,7 +107,11 @@ export default function App() {
 
       {/* Sidebar Navigation */}
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div 
+          className="logo-container" 
+          onClick={() => { setCurrentPage('dashboard'); setIsSidebarOpen(false); }}
+          style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+        >
           <img 
             src={irLogo} 
             alt="Indian Railways Logo" 
@@ -113,7 +125,7 @@ export default function App() {
           />
           <div style={{ flexGrow: 1 }}>
             <div className="logo-text">SECR</div>
-            <div className="logo-sub" style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>TELECOM</div>
+            <div className="logo-sub" style={{ fontSize: '10px', color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '1px' }}>TELECOM</div>
           </div>
           <button 
             className="sidebar-close-btn" 
@@ -134,13 +146,37 @@ export default function App() {
         </div>
 
         <nav className="nav-links">
-          <a 
-            className={`nav-item ${currentPage === 'dashboard' ? 'active' : ''}`}
-            onClick={() => { setCurrentPage('dashboard'); setIsSidebarOpen(false); }}
-          >
-            <LayoutDashboard size={18} />
-            DASHBOARD
-          </a>
+          <div className="nav-dropdown-container">
+            <button 
+              className="nav-item nav-dropdown-btn"
+              onClick={() => setIsAssetOpen(!isAssetOpen)}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Layers size={18} />
+                Asset
+              </span>
+              {isAssetOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+            
+            {isAssetOpen && (
+              <div className="nav-dropdown-items">
+                <a 
+                  className={`nav-item sub-item ${currentPage === 'communication' ? 'active' : ''}`}
+                  onClick={(e) => { e.preventDefault(); }}
+                >
+                  <Network size={16} />
+                  Communication
+                </a>
+                <a 
+                  className={`nav-item sub-item ${currentPage === 'passenger-amenities' ? 'active' : ''}`}
+                  onClick={(e) => { e.preventDefault(); }}
+                >
+                  <Users size={16} />
+                  Passenger Amenities
+                </a>
+              </div>
+            )}
+          </div>
           <a 
             className="nav-item"
             href="https://cable.secrtelecom.com/"
@@ -174,16 +210,6 @@ export default function App() {
           </a>
         </nav>
 
-        <div className="sidebar-footer">
-          <a className="nav-item" style={{ marginTop: 0 }} href="#help">
-            <HelpCircle size={18} />
-            HELP CENTER
-          </a>
-          <a className="nav-item" style={{ marginTop: 0 }} href="#logout">
-            <LogOut size={18} />
-            LOG OUT
-          </a>
-        </div>
       </aside>
 
       {/* Main Panel Content Area */}
@@ -239,9 +265,7 @@ export default function App() {
              >
                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
              </button>
-            <div className="user-profile">
-              <div className="profile-avatar">S</div>
-            </div>
+
           </div>
         </header>
 
