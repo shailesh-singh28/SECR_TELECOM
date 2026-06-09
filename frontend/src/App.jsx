@@ -147,38 +147,6 @@ export default function App() {
         </div>
 
         <nav className="nav-links">
-          
-          <a 
-            className="nav-item"
-            href="https://cable.secrtelecom.com/"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            <Route size={18} />
-            CABLE ROUTE
-          </a>
-          <a 
-            className="nav-item"
-            href="https://ohe-tracker-frontend-vikzmhbwja-el.a.run.app/"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            <Eye size={18} />
-            PATROLLING
-          </a>
-          <a 
-            className="nav-item"
-            href="https://meggering.secrtelecom.com/"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            <Activity size={18} />
-            MEGGERING
-          </a>
-          <a 
-            className={`nav-item ${currentPage === 'reports' ? 'active' : ''}`}
-            onClick={() => { setCurrentPage('reports'); setIsSidebarOpen(false); }}
-          >
-            <FileText size={18} />
-            DAILY POSITION
-          </a>
           <div className="nav-dropdown-container">
             <button 
               className="nav-item nav-dropdown-btn"
@@ -210,6 +178,37 @@ export default function App() {
               </div>
             )}
           </div>
+          <a 
+            className={`nav-item ${currentPage === 'reports' ? 'active' : ''}`}
+            onClick={() => { setCurrentPage('reports'); setIsSidebarOpen(false); }}
+          >
+            <FileText size={18} />
+            DAILY POSITION
+          </a>
+          <a 
+            className="nav-item"
+            href="https://cable.secrtelecom.com/"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <Route size={18} />
+            CABLE ROUTE
+          </a>
+          <a 
+            className="nav-item"
+            href="https://ohe-tracker-frontend-vikzmhbwja-el.a.run.app/"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <Eye size={18} />
+            PATROLLING
+          </a>
+          <a 
+            className="nav-item"
+            href="https://meggering.secrtelecom.com/"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <Activity size={18} />
+            MEGGERING
+          </a>
         </nav>
 
       </aside>
