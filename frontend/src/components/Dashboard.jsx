@@ -468,41 +468,7 @@ export default function Dashboard({ alertState, triggerAlert, mode = 'all' }) {
         </div>
       )}
 
-      {(mode === 'all' || mode === 'communication') && (
-        /* Infrastructure Health Index */
-        <div className="panel health-index-panel" style={{ marginTop: '24px' }}>
-          <div className="panel-header">
-            <div className="panel-title">
-              <Activity size={18} className="color-blue" />
-              Infrastructure Health Index
-            </div>
-            <div style={{ display: 'flex', gap: '20px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="status-dot bg-blue"></span> Copper Links</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="status-dot bg-green"></span> Fiber Links</span>
-            </div>
-          </div>
 
-          <div className="health-bar-container">
-            {Object.entries(data.divisions).map(([code, div]) => (
-              <div className="health-row" key={code}>
-                <div className="health-labels">
-                  <span>{div.name} ({code})</span>
-                  <span style={{ fontWeight: 'bold' }}>{div.uptime >= 100 ? '92%' : div.uptime >= 95 ? '88%' : '75%'} CAPACITY</span>
-                </div>
-                <div className="health-track">
-                  <div 
-                    className="health-fill" 
-                    style={{ 
-                      width: `${div.uptime >= 100 ? 92 : div.uptime >= 95 ? 88 : 75}%`,
-                      background: `linear-gradient(90deg, var(--accent-blue) 60%, ${div.uptime >= 95 ? 'var(--accent-green)' : 'var(--accent-red)'} 100%)`
-                    }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
