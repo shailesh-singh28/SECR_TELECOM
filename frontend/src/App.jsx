@@ -147,18 +147,12 @@ export default function App() {
 
         <nav className="nav-links">
           <a 
-            className={`nav-item ${currentPage === 'reports' ? 'active' : ''}`}
-            onClick={() => { setCurrentPage('reports'); setIsSidebarOpen(false); }}
+            className="nav-item"
+            href="https://dp-am-ui.vercel.app/#/dashboard"
+            onClick={() => setIsSidebarOpen(false)}
           >
             <FileText size={18} />
-            ASSET
-          </a>
-          <a 
-            className={`nav-item ${currentPage === 'reports' ? 'active' : ''}`}
-            onClick={() => { setCurrentPage('reports'); setIsSidebarOpen(false); }}
-          >
-            <FileText size={18} />
-            DAILY POSITION
+            DAILY POSITION & ASSET
           </a>
           <a 
             className="nav-item"
