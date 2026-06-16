@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet, Users, ClipboardList, Ticket, Clock, MapPin, Navigation, Grid, Train, Package, Network, Server, Zap, Radio, ShieldAlert, Play, Flag, Info, Ruler } from 'lucide-react';
+import { Shield, Activity, RefreshCw, Layers, FileSpreadsheet, Users, ClipboardList, Ticket, Clock, MapPin, Navigation, Grid, Train, Package, Network, Server, Zap, Radio, ShieldAlert, Play, Flag, Info, Ruler, Route } from 'lucide-react';
 
 import img1 from '../assets/1.jpeg';
 import img2 from '../assets/2.jpeg';
@@ -251,7 +251,7 @@ export default function Dashboard({ alertState, triggerAlert, mode = 'all' }) {
     <div id="gis-map-panel" className="panel">
       <div className="panel-header">
         <div className="panel-title">
-          <Activity size={18} className="color-green" />
+          <Route size={18} className="color-green" />
           SECR Rail Route
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
